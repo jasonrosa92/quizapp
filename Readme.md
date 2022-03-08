@@ -10,9 +10,10 @@ python3 -m venv (nome do seu ambiente virtual)
 ```
 
 - Clone o repositorio:
+
 ```commandline
 git clone https://github.com/jasonrosa92/quizapp
-- ```
+ ```
 
 #### Instalando os componentes necessários:
 - Acesse a pasta principal do projeto e rode o comando:
