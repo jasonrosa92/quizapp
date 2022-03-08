@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from .models import Pergunta, Tag, Resposta
+from .models import Pergunta, Resposta, RespostaUsuario
 
 
 def detalhes_pergunta(request, id_pergunta):
@@ -23,20 +23,31 @@ def editar_pergunta(request, id_pergunta):
 
 
 def responder(request, id_pergunta):
-    conteudo = request.POST['resposta']
+    user_pk = request.user.pk
     pergunta = Pergunta.objects.get(pk=id_pergunta)
+    respostas = Resposta.objects.filter(pergunta=id_pergunta)
+    if request.method == 'POST':
+        resposta = request.POST['resposta']
 
-    resposta = Resposta(conteudo=conteudo, pergunta=pergunta)
-    resposta.save()
+        #Resposta.objects.filter(pergunta=pergunta).update_or_create(conteudo=resposta)
+        obj = RespostaUsuario.objects.create(
+            respostas='id_resposta',
+            pergunta='id_pergunta',
+            usuario='user_pk',
+        )
+        obj.save()
+        return redirect('index')
 
-    return redirect('index')
+    response = {"pergunta": pergunta,
+                "respostas": respostas}
+
+    return render(request, 'listagem_respostas.html', response)
 
 
 def perguntas_recentes(request):
     perguntas = Pergunta.objects.all()
-    tags = Tag.objects.all()
 
-    dados = {"perguntas": perguntas, "tags": tags}
+    dados = {"perguntas": perguntas}
 
     return render(request, 'listagem_perguntas.html', dados)
 
@@ -44,13 +55,11 @@ def perguntas_recentes(request):
 def respostas(request, id_pergunta):
     pergunta = Pergunta.objects.get(pk=id_pergunta)
     respostas = Resposta.objects.filter(pergunta=id_pergunta)
-    tags = Tag.objects.all()
+
     comentarios = pergunta.comentarios.all()
 
     dados = {'respostas': respostas,
              'pergunta': pergunta,
-             'tags': tags,
-             'comentarios': comentarios,
              }
 
     return render(request, "listagem_respostas.html", dados)
@@ -71,12 +80,4 @@ def escolher_resposta(request, id_resposta):
     return redirect('index')
 
 
-def criar_tag(request):
-    nome = request.POST['tag']
 
-    existe = Tag.objects.filter(nome__icontains=nome).count()
-
-    if not existe:
-        tag = Tag.objects.create(nome=nome)
-
-    return redirect('index')

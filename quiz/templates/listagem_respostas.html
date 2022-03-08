@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+
+
+<div class="box-content">
+    <div class="row">
+        <div class="col-lg-11">
+
+            <h3 class="titulo">{{ pergunta.titulo }}</h3>
+
+            <p class="conteudo-pergunta">{{ pergunta.parsed|safe }}</p>
+            <form class="form-resposta row" action="/perguntas/{{ pergunta.id }}/responder/" method="POST">
+                {% csrf_token %}
+                    {% for resposta in respostas %}
+                          <input type="radio" id="{{ resposta.id }}" name="resposta" value="{{ resposta.id }}">
+                          <label for="{{ resposta.id }}">{{ resposta }}</label><br>
+                    {% endfor %}
+                <button type="submit" >Responder</button>
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+
+{% endblock %}
+
+
